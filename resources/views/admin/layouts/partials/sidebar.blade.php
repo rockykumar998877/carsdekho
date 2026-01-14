@@ -4,20 +4,20 @@
     <div class="sidebar overflow-hidden" id="sidebar">
         <div class="sidebar-inner h-100 overflow-hidden">
             <!-- Sidebar Header -->
-            <div class="sidebar-header p-3">
-                <div class="sidebar-logo-area">
-                    <!-- mini logo -->
-                    <div class="mini-logo text-center tansition-opacity d-none">
-                        <a href="#" class="m-auto w-75">
-                            <img src="{{ Vite::asset(config('constants.company_logo')) }}" alt="Logo"  class="m-auto img-fluid" />
-                        </a>
-                    </div>
+            <div class="sidebar-header p-3 text-center border-bottom pb-3 mb-3">
+                <div class="sidebar-logo-area d-flex flex-column align-items-center justify-content-center">
                     <!-- full logo -->
-                    <div class="full-logo text-center tansition-opacity">
-                        <a href="#" class="m-auto w-75">
-                            <img src="{{ Vite::asset(config('constants.company_logo')) }}" alt="Logo"  class="m-auto img-fluid" />
+                    <div class="full-logo text-center mb-2">
+                        <a href="{{ route('admin.dashboard.index') }}" class="d-inline-block text-decoration-none">
+                            {{-- Use a fixed height/width constraint for the logo --}}
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center shadow-sm border border-secondary border-opacity-25" style="width: 80px !important; height: 80px !important; margin: 0 auto;">
+                                <img src="{{ Vite::asset(config('constants.company_logo')) }}" alt="Logo" class="object-fit-contain" style="max-height: 50px !important; max-width: 50px !important; width: auto; height: auto;" />
+                            </div>
                         </a>
                     </div>
+                    <!-- Brand Name -->
+                    <h5 class="text-dark fw-bold mb-0">Car Rental</h5>
+                    <small class="text-muted">Admin Panel</small>
                 </div>
             </div>
             <!-- Sidebar menus start -->
