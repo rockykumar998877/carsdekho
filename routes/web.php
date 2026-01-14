@@ -14,23 +14,20 @@ Route::get('/booking', [BookingController::class, 'create'])->name('booking.crea
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 Route::get('/get-cars', [BookingController::class, 'getCars'])->name('get.cars');
 
-// Admin - Public routes (Login will need to be created)
+// Admin - Public routes (Login)
 Route::prefix('admin')->name('admin.')->group(function () {
-    // TODO: Create Login, ForgotPassword, ResetPassword controllers
-    // For now, these routes are disabled until controllers are created
-    // Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    // Route::post('/login', [AuthController::class, 'login']);
-    // Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
-    // Route::get('reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::get('/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('post-login');
+    
+    // Password Reset Routes
+    Route::get('/forgot-password', [\App\Http\Controllers\Admin\AuthController::class, 'showForgotPassword'])->name('forgot-password');
+    Route::post('/forgot-password', [\App\Http\Controllers\Admin\AuthController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\Admin\AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\Admin\AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 // Logout route  
-Route::post('/logout', function() {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/admin/login');
-})->name('logout');
+Route::post('/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 
 // Admin - Protected routes
 Route::middleware(['auth'])->group(function () {

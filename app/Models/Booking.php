@@ -51,4 +51,9 @@ class Booking extends Model
     {
         return $this->belongsTo(CarCategory::class, 'category_id');
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(CarCategory::class, 'booking_category', 'booking_id', 'category_id')->withTimestamps();
+    }
 }

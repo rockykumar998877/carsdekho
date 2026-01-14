@@ -7,7 +7,7 @@
     <section class="login-sec">
         <div class="container">
             <div class="row justify-content-center flex-column align-items-center">
-                <div class="mb-4 col-xl-4 col-lg-6">
+                <div class="mb-4 col-xl-12 col-lg-8">
                     <div class="text-center d-block card-image">
                         <img src="{{ Vite::asset(config('constants.company_logo')) }}" alt="logo" class="img-fluid" />
                     </div>

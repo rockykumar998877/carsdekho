@@ -20,7 +20,7 @@
 <body>
     <div id="app">
         <main class="min-vh-100 d-flex align-items-center justify-content-center bg-light py-4">
-           {{ $slot }}
+            @yield('content')
         </main>
     </div>
     @livewireScripts

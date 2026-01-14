@@ -81,22 +81,26 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="category_id" class="form-label">Car Category <span class="required">*</span></label>
-                            <select 
-                                id="category_id" 
-                                name="category_id" 
-                                class="form-select @error('category_id') error @enderror"
-                                required
-                            >
-                                <option value="">Select a category</option>
+                            <label class="form-label">Car Categories <span class="required">*</span></label>
+                            <div class="category-checkbox-grid">
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
+                                    <div class="form-check custom-checkbox">
+                                        <input 
+                                            class="form-check-input category-checkbox" 
+                                            type="checkbox" 
+                                            name="category_ids[]" 
+                                            value="{{ $category->id }}" 
+                                            id="category_{{ $category->id }}"
+                                            {{ (is_array(old('category_ids')) && in_array($category->id, old('category_ids'))) ? 'checked' : '' }}
+                                        >
+                                        <label class="form-check-label" for="category_{{ $category->id }}">
+                                            {{ $category->name }}
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
-                            @error('category_id')
-                                <span class="error-message">{{ $message }}</span>
+                            </div>
+                            @error('category_ids')
+                                <span class="error-message d-block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -176,26 +180,55 @@
     </section>
 </div>
 
+@push('styles')
+<style>
+    .category-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .custom-checkbox {
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .custom-checkbox:hover {
+        border-color: #3b82f6;
+        background-color: #f8fafc;
+    }
+    .form-check-input:checked + .form-check-label {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const categorySelect = document.getElementById('category_id');
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
     const carSelect = document.getElementById('car_id');
     const startDateInput = document.getElementById('start_date');
     const endDateInput = document.getElementById('end_date');
 
     // Handle category change
-    categorySelect.addEventListener('change', function() {
-        const categoryId = this.value;
+    function updateCars() {
+        const selectedCategories = Array.from(categoryCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
         
-        if (!categoryId) {
+        if (selectedCategories.length === 0) {
             carSelect.disabled = true;
             carSelect.innerHTML = '<option value="">First select a category</option>';
             return;
         }
 
-        // Fetch cars for selected category
-        fetch(`{{ route('get.cars') }}?category_id=${categoryId}`)
+        // Fetch cars for selected categories
+        const categoryQuery = selectedCategories.join(',');
+        fetch(`{{ route('get.cars') }}?category_id=${categoryQuery}`)
             .then(response => response.json())
             .then(cars => {
                 carSelect.disabled = false;
@@ -212,6 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error fetching cars:', error);
                 carSelect.innerHTML = '<option value="">Error loading cars</option>';
             });
+    }
+
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCars);
     });
 
     // Set minimum end date based on start date

@@ -19,7 +19,9 @@ class BookingController extends Controller
 
     public function getCars(Request $request)
     {
-        $cars = Car::where('category_id', $request->category_id)
+        $categoryIds = is_array($request->category_id) ? $request->category_id : explode(',', $request->category_id);
+        
+        $cars = Car::whereIn('category_id', $categoryIds)
             ->where('is_available', true)
             ->get();
         
@@ -33,7 +35,8 @@ class BookingController extends Controller
             'customer_phone' => 'required|string|max:20',
             'customer_email' => 'required|email|max:255',
             'customer_address' => 'required|string',
-            'category_id' => 'required|exists:car_categories,id',
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'exists:car_categories,id',
             'car_id' => 'nullable|exists:cars,id',
             'start_date' => 'nullable|date|after_or_equal:today',
             'end_date' => 'nullable|date|after:start_date',
@@ -57,8 +60,8 @@ class BookingController extends Controller
                 $totalPrice = $car->price_per_day * $totalDays;
             }
 
-            Booking::create([
-                'category_id' => $request->category_id,
+            $booking = Booking::create([
+                'category_id' => $request->category_ids[0], // Use first category as primary
                 'car_id' => $request->car_id ?? null,
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
@@ -71,6 +74,9 @@ class BookingController extends Controller
                 'total_price' => $totalPrice,
                 'status' => 'pending',
             ]);
+
+            // Attach all selected categories
+            $booking->categories()->attach($request->category_ids);
 
             DB::commit();
 
